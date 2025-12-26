@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model GuildSetting {
+  guildId    String   @id
+  adminRoles Json     @default("[]")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model RoleCache {
+  id           Int      @id @default(autoincrement())
+  discordId    String   @unique
+  roles        Json
+  isOwner      Boolean  @default(false)
+  isDeveloper  Boolean  @default(false)
+  isAdmin      Boolean  @default(false)
+  cachedAt     DateTime @default(now())
+  expiresAt    DateTime
+
+  @@index([discordId])
+  @@index([expiresAt])
+}
+
+model TrendingChannel {
+  id         Int      @id @default(autoincrement())
+  guildId    String
+  channelId  String
+  type       String
+  enabled    Boolean  @default(true)
+  lastUpdate DateTime?
+  messageId  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([guildId, channelId, type])
+  @@index([guildId, enabled])
+}
+
+model SearchCache {
+  id        Int      @id @default(autoincrement())
+  query     String
+  type      String
+  results   Json
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([query, type])
+  @@index([expiresAt])
+}
+
+model CommandStat {
+  id          Int      @id @default(autoincrement())
+  guildId     String
+  userId      String
+  commandName String
+  usedAt      DateTime @default(now())
+
+  @@index([guildId, commandName])
+  @@index([usedAt])
+}
+

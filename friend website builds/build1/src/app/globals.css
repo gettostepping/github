@@ -1,0 +1,373 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Advanced animations for Reminiscent logo */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes reverse-spin {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes float-up {
+  0% { 
+    transform: translateY(0px) scale(0);
+    opacity: 0;
+  }
+  50% { 
+    transform: translateY(-10px) scale(1);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(-20px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-down {
+  0% {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-reverse-spin {
+  animation: reverse-spin 2s linear infinite;
+}
+
+    .animate-float-up {
+      animation: float-up 1.5s ease-out infinite;
+    }
+
+@keyframes text-shine {
+  0% {
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.4), 0 0 12px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 12px rgba(239, 68, 68, 0.6), 0 0 18px rgba(239, 68, 68, 0.4);
+  }
+  100% {
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.4), 0 0 12px rgba(239, 68, 68, 0.3);
+  }
+}
+
+.text-glow-red {
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5), 0 0 15px rgba(239, 68, 68, 0.3);
+  animation: text-shine 3s ease-in-out infinite;
+}
+
+    /* Cross-browser compatibility fixes */
+    .text-transparent {
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    /* Fallback for browsers that don't support background-clip: text */
+    @supports not (background-clip: text) {
+      .text-transparent {
+        color: #8b5cf6 !important;
+        -webkit-text-fill-color: initial;
+        -webkit-background-clip: initial;
+        background-clip: initial;
+      }
+    }
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  @apply bg-black text-white;
+}
+
+a { @apply text-brand-400 hover:text-brand-300; }
+
+.card {
+  @apply bg-neutral-900/70 border border-neutral-800 rounded-lg shadow;
+}
+
+.btn {
+  @apply inline-flex items-center gap-2 rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-60;
+}
+
+/* Custom scrollbar styles - Global application */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(82, 82, 82, 0.8) rgba(38, 38, 38, 0.8);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(38, 38, 38, 0.8);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(82, 82, 82, 0.8);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(115, 115, 115, 0.9);
+}
+
+/* Custom scrollbar styles - Thin variant (for backwards compatibility) */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(38, 38, 38, 0.8);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(82, 82, 82, 0.8);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(115, 115, 115, 0.9);
+}
+
+/* Firefox scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(82, 82, 82, 0.8) rgba(38, 38, 38, 0.8);
+}
+
+/* Custom checkbox styling - X mark instead of checkmark for API key permissions only */
+.api-key-permission-checkbox {
+  position: relative;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Hide default checkmark */
+.api-key-permission-checkbox:checked {
+  background-image: none !important;
+}
+
+/* Show X mark when checked */
+.api-key-permission-checkbox:checked::after {
+  content: '✕';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Custom radio button styling */
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid rgb(82, 82, 82) !important; /* neutral-600 */
+  border-radius: 50%;
+  background-color: rgb(23, 23, 23) !important; /* neutral-900 */
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+input[type="radio"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  ring: none !important;
+}
+
+input[type="radio"]:checked {
+  border-color: rgb(163, 163, 163) !important; /* neutral-400 */
+  background-color: transparent !important;
+}
+
+input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgb(163, 163, 163); /* neutral-400 */
+}
+
+/* Vidstack and video player styles */
+media-player {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+}
+
+media-outlet {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+media-outlet video,
+media-player video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: #000 !important;
+}
+
+/* Vidstack subtitle/caption customization */
+media-captions {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  font-size: 1.25rem !important;
+  line-height: 1.5 !important;
+  color: #ff0000 !important;
+  background: rgba(0, 255, 98, 0.75) !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.375rem !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+  bottom: 5rem !important;
+  max-width: 90% !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+/* Subtitle text styling */
+media-captions [data-part="cue"] {
+  color: #00ff2a !important;
+  font-weight: 500 !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9), 
+               0 0 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Subtitle background box */
+media-captions [data-part="display"] {
+  background: rgba(255, 2, 2, 0.75) !important;
+  backdrop-filter: blur(4px) !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Hide native HTML5 video controls - Vidstack handles all controls */
+/* Native controls are hidden via the webkit pseudo-elements below */
+
+/* Hide native video controls panel */
+media-player video::-webkit-media-controls-panel,
+media-outlet video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+media-player video::-webkit-media-controls,
+media-outlet video::-webkit-media-controls {
+  display: none !important;
+}
+
+media-player video::-webkit-media-controls-enclosure,
+media-outlet video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+/* Native video player styles for HLS (fallback only) */
+video:not([data-media-element]) {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  background: #000 !important;
+}
+
+/* Native video captions styling (fallback) */
+video:not([data-media-element])::cue {
+  color: #ffffff !important;
+  background: rgba(0, 0, 0, 0.75) !important;
+  font-size: 1.25rem !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-volume-slider,
+video::-webkit-media-controls-timeline {
+  filter: invert(1) !important;
+}
+
+/* Custom range slider styles for video player */
+input[type="range"].slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #a855f7;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"].slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #a855f7;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"]:not(.slider) {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]:not(.slider)::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #a855f7;
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+
+input[type="range"]:not(.slider)::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #a855f7;
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+

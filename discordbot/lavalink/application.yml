@@ -1,0 +1,14 @@
+   server:
+     port: 3009
+     address: 0.0.0.0
+   
+   lavalink:
+     server:
+       password: "fuckingPassword"
+       sources:
+         youtube: false
+         soundcloud: true
+         bandcamp: true
+         twitch: true
+         vimeo: true
+         http: true

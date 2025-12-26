@@ -1,0 +1,38 @@
+{
+    "name": "structure-discord-bot",
+    "version": "2.0.0",
+    "description": "Command, slash command & event handler - Discord Bot Template (v13)",
+    "main": "index.js",
+    "scripts": {
+        "start": "node .",
+        "slash": "node slash.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "github.com/meliooff/Structure-Discord-Bot"
+    },
+    "keywords": [
+        "event-handler",
+        "command-handler",
+        "discord-bot-template",
+        "slash-command-handler"
+    ],
+    "author": "meliooff",
+    "license": "MIT",
+    "dependencies": {
+        "@prisma/adapter-pg": "^7.1.0",
+        "@prisma/client": "^7.1.0",
+        "axios": "^1.13.2",
+        "better-sqlite3": "^12.5.0",
+        "chalk": "^4.1.2",
+        "discord.js": "^14.16.3",
+        "fs": "^0.0.1-security",
+        "moment": "^2.30.1",
+        "moonlink.js": "^4.60.21",
+        "node-cron": "^4.2.1",
+        "pg": "^8.16.3",
+        "prisma": "^7.1.0",
+        "quick.db": "^9.1.7"
+    }
+}

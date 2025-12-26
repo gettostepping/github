@@ -1,0 +1,292 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      String   @id @default(cuid())
+  uid                     Int      @unique
+  email                   String?  @unique
+  password                String?
+  name                    String?  @unique
+  image                   String?
+  discordId               String?  @unique
+  banner                  String?
+  lastMassInviteMessageId String?  // Track which mass invite message user last saw
+  bypassDiscordLink       Boolean  @default(false) // If true, user doesn't need to link Discord
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  watchlists       Watchlist[]
+  profile          Profile?
+  roles            Role[]
+  ratings          Rating[]
+  comments         ProfileComment[]
+  reports          Report[]
+  commentLikes     CommentLike[]
+  presence         Presence?
+  profileViews     ProfileView[]
+  searches         Search[]
+}
+
+model DiscordPresence {
+  id           String   @id @default(uuid())
+  userId       String   @unique // Discord user ID
+  status       String   // 'online', 'idle', 'dnd', 'offline'
+  activityName String?  // Optional activity name
+  activityType String?  // Optional activity type
+  updatedAt    DateTime @updatedAt
+}
+
+model Watchlist {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  tmdbId      Int
+  type        String  // 'movie' or 'tv'
+  title       String
+  poster      String?
+  lastSeason  Int?     // Last watched season (TV shows only)
+  lastEpisode Int?     // Last watched episode (TV shows only)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, tmdbId], name: "userId_tmdbId")
+}
+
+model Profile {
+  id             String   @id @default(cuid())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String   @unique
+  bio            String?  @db.Text
+  themeAccent    String?  // hex color
+  banner         String?
+  customAvatar   String?
+  customBanner   String?
+  lastActiveAt   DateTime @default(now())
+  
+  // Currently Watching (real-time)
+  currentWatchingId Int?
+  currentWatchingType String? // 'movie' | 'tv'
+  currentWatchingSeason Int?
+  currentWatchingEpisode Int?
+  currentWatchingTitle  String?
+  currentWatchingPoster String?
+  currentWatchingTmdbId Int?
+  
+  // Last Watching (persistent)
+  lastWatchingId Int?
+  lastWatchingType String? // 'movie' | 'tv'
+  lastWatchingSeason Int?
+  lastWatchingEpisode Int?
+  lastWatchingTitle  String?
+  lastWatchingPoster String?
+  lastWatchingTmdbId Int?
+  
+  // Premium/VIP Customization
+  profileLayout     String?   @default("default") // 'default' | 'compact' | 'minimal' | 'detailed'
+  showStats         Boolean   @default(true)
+  showLastWatching  Boolean   @default(true)
+  showComments      Boolean   @default(true)
+  customCss         String?   @db.Text // VIP only - custom CSS
+  profileBadges     String[]  @default([]) // VIP only - custom badges
+  profileEffects    String[]  @default([]) // VIP only - visual effects
+  musicRole         String?   // Legacy field - preserved to avoid data loss
+  
+  views          ProfileView[]
+  comments       ProfileComment[]
+}
+
+model ProfileView {
+  id        String   @id @default(cuid())
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+  viewerId  String?
+  viewer    User?    @relation(fields: [viewerId], references: [id])
+  createdAt DateTime @default(now())
+  @@index([profileId, createdAt])
+}
+
+model ProfileComment {
+  id        String   @id @default(cuid())
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  body      String
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+  reports   Report[]
+  likedBy   CommentLike[]
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  comment   ProfileComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+model Presence {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @unique
+  currentPage String?  // Track what page the user is currently on
+  pageType    String?  // Track the type of page (e.g., 'browsing', 'watching')
+  mediaType   String?  // Track media type for watch pages (e.g., 'tv', 'movie')
+  updatedAt   DateTime @updatedAt
+  now         DateTime @default(now())
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  name      String   // 'owner' | 'developer' | 'admin' | 'moderator' | 'trial_mod' | 'premium' | 'vip'
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, name], name: "userId_name")
+}
+
+model Ban {
+  id        String   @id @default(cuid())
+  userId    String?
+  ip        String?
+  reason    String?
+  bannedUntil DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId])
+  @@index([ip])
+}
+
+model Invites {
+  id                      String   @id @default(cuid())
+  code                    String   @unique
+  issuerId                String?
+  enabled                 Boolean  @default(true)
+  usedBy                  Int      @default(0)
+  testingMode             Boolean  @default(false) // If true, bypasses multi-account detection
+  bypassDiscordRequirement Boolean @default(false) // If true, users created with this invite don't need Discord link
+  massInviteMessage       String?  // Message for mass invites
+  massInviteMessageId     String?  // Unique ID to group mass invites with same message
+  targetUserId            Int?     // UID of the user this mass invite was created for
+  createdAt               DateTime @default(now())
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  comment    ProfileComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId  String
+  reporter   User     @relation(fields: [reporterId], references: [id])
+  reporterId String
+  reason     String
+  details    String?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  tmdbId    Int
+  type      String   // 'movie' | 'tv'
+  rating    Int      // 1-5 stars
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, tmdbId, type], name: "user_tmdb_type")
+  @@index([tmdbId, type])
+  @@index([rating])
+}
+
+model Search {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  query     String
+  results   Int      // Number of results returned
+  createdAt DateTime @default(now())
+  
+  @@index([userId, createdAt])
+  @@index([query])
+}
+
+model TrackedIdentity {
+  id          String   @id @default(cuid())
+  discordId   String?  @unique
+  email       String?  @unique
+  name        String?  // Store user's name when deleted/banned
+  ipAddress   String?
+  reason      String   // "deleted", "banned", "suspicious"
+  originalUid Int?     // Original user UID (for reference)
+  createdAt   DateTime @default(now())
+  
+  @@index([discordId])
+  @@index([email])
+}
+
+model PendingRegistration {
+  id          String   @id @default(cuid())
+  discordId   String
+  email       String
+  name        String
+  avatarUrl   String?
+  bannerUrl   String?
+  password    String   // Hashed password set during registration
+  inviteCode  String
+  flagReason  String   // Why they were flagged
+  status      String   @default("pending") // pending, approved, denied
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([status])
+  @@index([discordId])
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  key         String   @unique // Hashed API key (never store plain text)
+  plainKey    String?  // Plain text key (encrypted) - Only for Owner/Developer access
+  name        String   // Human-readable name for the key
+  createdBy   String   // User ID who created it (Owner/Developer only)
+  userId      String?  // Optional: User ID this key is tied to (for user-specific API keys)
+  permissions String[] @default([]) // Array of permission strings like ["admin.read", "users.read", "users.write"]
+  lastUsedAt  DateTime? // Track when key was last used
+  expiresAt   DateTime? // Optional expiration date
+  revoked     Boolean  @default(false) // Can revoke without deleting
+  frozen      Boolean  @default(false) // Can freeze without fully revoking
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([createdBy])
+  @@index([userId])
+  @@index([revoked])
+  @@index([frozen])
+}
+
+model ApiRequestLog {
+  id          String   @id @default(cuid())
+  endpoint    String   // API endpoint path (e.g., /api/admin/stats)
+  method      String   // HTTP method (GET, POST, etc.)
+  statusCode  Int      // HTTP status code (200, 404, 500, etc.)
+  apiKeyId    String?  // API key ID if request used API key (null for session auth)
+  responseTime Int     // Response time in milliseconds
+  ipAddress   String?  // IP address of the requester
+  userAgent   String?  // User agent string
+  createdAt   DateTime @default(now())
+  
+  @@index([createdAt])
+  @@index([apiKeyId])
+  @@index([endpoint])
+  @@index([statusCode])
+  @@index([method])
+}
+
+
