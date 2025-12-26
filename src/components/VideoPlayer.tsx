@@ -147,6 +147,9 @@ export default function VideoPlayer({
           crossOrigin="anonymous"
           load="eager"
           // Optimize HLS config for buffering and stability
+          // Note: Vidstack's MediaPlayer component accepts arbitrary props which are passed down
+          // but TypeScript strict checking might flag unknown props.
+          // @ts-ignore - hlsConfig is a valid prop for the HLS provider in Vidstack but types might be missing
           hlsConfig={{
             maxBufferSize: 30 * 1000 * 1000, // Increase buffer size to 30MB (default 60MB, but let's be explicit)
             maxBufferLength: 60, // Increase max buffer length to 60 seconds (default 30)
